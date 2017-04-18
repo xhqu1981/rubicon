@@ -38,6 +38,7 @@ def main():
         new_mol = mxyz.molecules[-1]
         qcinp.jobs[0].params["rem"].pop("aimd_init_veloc", None)
         qcnv = QcNucVeloc(options.velocity)
+        assert len(mxyz.molecules) == len(qcnv.velocities)
         qcinp.jobs[0].set_velocities(qcnv.velocities[-1])
     if charge is not None:
         new_mol.set_charge_and_spin(charge, spin)
