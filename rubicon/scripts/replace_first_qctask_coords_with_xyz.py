@@ -6,7 +6,7 @@ from __future__ import division, print_function, unicode_literals, \
 import argparse
 
 from pymatgen.core.structure import Molecule
-from pymatgen.io.qchem import QcInput
+from pymatgen.io.qchem import QcInput, QcNucVeloc
 from pymatgen.io.xyz import MXYZ
 
 __author__ = 'xiaohuiqu'
@@ -37,6 +37,8 @@ def main():
         mxyz = MXYZ.from_file(options.coords)
         new_mol = mxyz.molecules[-1]
         qcinp.jobs[0].params["rem"].pop("aimd_init_veloc", None)
+        qcnv = QcNucVeloc(options.velocity)
+        qcinp.jobs[0].set_velocities(qcnv.velocities[-1])
     if charge is not None:
         new_mol.set_charge_and_spin(charge, spin)
     qcinp.jobs[0].mol = new_mol
