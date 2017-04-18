@@ -143,7 +143,8 @@ class QChemTask(FireTaskBase, FWSerializable):
 
     @classmethod
     def run_qchem(cls, qcinp, implicit_solvent, mixed_aux_basis, mixed_basis,
-                  input_file="mol.qcinp", output_file="mol.qcout", gzipped=True):
+                  input_file="mol.qcinp", output_file="mol.qcout", gzipped=True,
+                  run_name=None):
         mol = qcinp.jobs[0].mol
         num_atoms = len(mol)
         for qj in qcinp.jobs:
@@ -185,7 +186,8 @@ class QChemTask(FireTaskBase, FWSerializable):
         total_physical_memory = cls.get_physical_memory()
         job = QchemJob(qc_exe, input_file=input_file, output_file=output_file,
                        qclog_file=qclog_file, alt_cmd=alt_cmd, gzipped=gzipped,
-                       total_physical_memory=total_physical_memory)
+                       total_physical_memory=total_physical_memory,
+                       run_name=run_name)
         handler = QChemErrorHandler(qchem_job=job, input_file=input_file,
                                     output_file=output_file,
                                     scf_max_cycles=scf_max_cycles,

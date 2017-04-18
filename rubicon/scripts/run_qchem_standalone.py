@@ -27,13 +27,15 @@ from rubicon.utils.qchem_firework_creator import QChemFireWorkCreator
 __author__ = 'xiaohuiqu'
 
 
-def call_qchem_task(filename, solvent=None, mixed_basis=None, mixed_aux_basis=None):
+def call_qchem_task(filename, solvent=None, mixed_basis=None, mixed_aux_basis=None,
+                    run_name=None):
     base_filename = os.path.splitext(filename)[0]
     output_filename = base_filename + ".qcout"
     qcinp = QcInput.from_file(filename)
     solvent_token = set_solvent_data(qcinp, solvent)
     QChemTask.run_qchem(qcinp, solvent_token, mixed_aux_basis, mixed_basis,
-                        input_file=filename, output_file=output_filename, gzipped=False)
+                        input_file=filename, output_file=output_filename,
+                        gzipped=False, run_name=run_name)
 
 def set_solvent_data(qcinp, solvent, vdw_surface=True):
     if not solvent:
@@ -92,8 +94,12 @@ def main():
     parser.add_argument("-s", "--solvent", dest="solvent", type=str,
                         required=False,
                         help="the implicit solvent")
+    parser.add_argument("-n", "--run_name", dest="run_name", type=str,
+                        default=None,
+                        help="the implicit solvent")
     options = parser.parse_args()
-    call_qchem_task(options.filename, options.solvent, options.mixed_basis, options.mixed_aux_basis)
+    call_qchem_task(options.filename, options.solvent, options.mixed_basis, options.mixed_aux_basis,
+                    run_name=options.run_name)
     if options.eli_img:
         base_filename = os.path.splitext(options.filename)[0]
         output_filename = base_filename + ".qcout"
@@ -122,7 +128,8 @@ def main():
             qcinp = QcInput([qctask_opt, qctask_freq])
             eli_file_1 = base_filename + "_eli_img_1.qcinp"
             qcinp.write_file(eli_file_1)
-            call_qchem_task(eli_file_1)
+            call_qchem_task(eli_file_1, options.solvent, options.mixed_basis, options.mixed_aux_basis,
+                            run_name=options.run_name)
 
             output_filename = base_filename + "_eli_img_1.qcout"
             qcout = QcOutput(output_filename)
@@ -148,7 +155,8 @@ def main():
                         j.set_geom_max_iterations(100)
                 eli_file_2 = base_filename + "_eli_img_2.qcinp"
                 qcinp.write_file(eli_file_2)
-                call_qchem_task(eli_file_2)
+                call_qchem_task(eli_file_2, options.solvent, options.mixed_basis, options.mixed_aux_basis,
+                                run_name=options.run_name)
 
                 output_filename = base_filename + "_eli_img_2.qcout"
                 qcout = QcOutput(output_filename)
@@ -174,7 +182,8 @@ def main():
                             j.set_geom_max_iterations(100)
                     eli_file_3 = base_filename + "_eli_img_3.qcinp"
                     qcinp.write_file(eli_file_3)
-                    call_qchem_task(eli_file_3, options.solvent, options.mixed_basis, options.mixed_aux_basis)
+                    call_qchem_task(eli_file_3, options.solvent, options.mixed_basis, options.mixed_aux_basis,
+                                    run_name=options.run_name)
 
 
 if __name__ == '__main__':
