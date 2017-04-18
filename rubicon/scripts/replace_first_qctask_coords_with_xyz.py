@@ -7,6 +7,7 @@ import argparse
 
 from pymatgen.core.structure import Molecule
 from pymatgen.io.qchem import QcInput
+from pymatgen.io.xyz import MXYZ
 
 __author__ = 'xiaohuiqu'
 
@@ -21,13 +22,21 @@ def main():
     parser.add_argument("-c", "--coords", dest="coords", type=str,
                         required=True,
                         help="The XYZ file contains the new coords")
+    parser.add_argument("-v", "--velocity", dest="velocity", type=str,
+                        default=None,
+                        help="The AIMD velocity file")
     parser.add_argument("-o", "--output", dest="output", type=str,
                         required=True,
                         help="the QChem input filename with the coordinates from the XYZ file")
     options = parser.parse_args()
     qcinp = QcInput.from_file(options.input)
     charge, spin = qcinp.jobs[0].charge, qcinp.jobs[0].spin_multiplicity
-    new_mol = Molecule.from_file(options.coords)
+    if options.velocity is None:
+        new_mol = Molecule.from_file(options.coords)
+    else:
+        mxyz = MXYZ.from_file(options.coords)
+        new_mol = mxyz.molecules[-1]
+        qcinp.jobs[0].params["rem"].pop("aimd_init_veloc", None)
     if charge is not None:
         new_mol.set_charge_and_spin(charge, spin)
     qcinp.jobs[0].mol = new_mol
