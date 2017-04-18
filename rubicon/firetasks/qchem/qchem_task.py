@@ -96,18 +96,18 @@ class QChemTask(FireTaskBase, FWSerializable):
         physical_nproc_map = {"edison": 24,
                               "cori": 32,
                               "matgen": 16,
-                              "macqu": 2}
+                              "LaptopQu.local": 2}
         numa_num_map = {"edison": 2,
                         "cori": 2,
                         "matgen": 2,
-                        "macqu": 1}
+                        "LaptopQu.local": 1}
         hostname = cls.get_hostname()
         if hostname in physical_nproc_map:
             physical_nproc = physical_nproc_map[hostname]
         elif hostname == 'vesta':
             return ALCF_Utils.get_alcf_qchem_cmd(qcinp)
         else:
-            return ["qchem"] * 3
+            return [["qchem"]] * 3
         natoms = len(mol)
         fw_data = FWData()
         if fw_data.MULTIPROCESSING and fw_data.SUB_NPROCS is not None:
