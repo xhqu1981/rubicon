@@ -169,6 +169,11 @@ class QChemTask(FireTaskBase, FWSerializable):
             qc_exe = openmp_cmd
             alt_cmd["half_cpus"] = shlex.split(" ".join(half_cpus_cmd).replace("-np", "-nt"))
             alt_cmd.pop("openmp")
+        elif cls._is_openmp_compatible_job(qcinp):
+            qc_exe = openmp_cmd
+            alt_cmd.pop("openmp")
+        else:
+            alt_cmd.pop("openmp")
         if num_atoms > 50:
             scf_max_cycles = 300
             geom_max_cycles = 500
@@ -206,6 +211,14 @@ class QChemTask(FireTaskBase, FWSerializable):
                 if mp2task in theor_method:
                     return True
         return False
+
+    @staticmethod
+    def _is_openmp_compatible_job(qcinp):
+        for qctask in qcinp.jobs:
+            rems = qctask.params["rem"]
+            if rems["jobtype"] == "freq":
+                return False
+        return True
 
     @staticmethod
     def _get_qcinp_from_fw_spec(fw_spec):
