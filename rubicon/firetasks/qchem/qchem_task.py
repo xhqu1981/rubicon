@@ -216,7 +216,7 @@ class QChemTask(FireTaskBase, FWSerializable):
     def _is_openmp_compatible_job(qcinp):
         for qctask in qcinp.jobs:
             rems = qctask.params["rem"]
-            if rems["jobtype"] == "freq":
+            if rems["jobtype"] in ["freq", "nmr"]:
                 return False
         return True
 
@@ -328,7 +328,7 @@ class ALCF_Utils(object):
     def _customize_alcf_qcinp(qcinp, num_nodes=8):
         for qj in qcinp.jobs:
             qj.params["rem"]["parallel_tasks"] = num_nodes
-            if qj.params["rem"]["jobtype"] == "freq":
+            if qj.params["rem"]["jobtype"] in ["freq", "nmr"]:
                 qj.params["rem"]["ideriv"] = 1
             qj.params["rem"]["PDIAG_ON"] = 1
             solvent_params = qj.params.pop("pcm_solvent", None)
