@@ -7,7 +7,7 @@ import argparse
 
 from pymatgen.core.structure import Molecule
 from pymatgen.io.qchem import QcInput, QcNucVeloc
-from pymatgen.io.xyz import MXYZ
+from pymatgen.io.xyz import XYZ
 
 __author__ = 'xiaohuiqu'
 
@@ -34,8 +34,8 @@ def main():
     if options.velocity is None:
         new_mol = Molecule.from_file(options.coords)
     else:
-        mxyz = MXYZ.from_file(options.coords)
-        new_mol = mxyz.molecules[-1]
+        mxyz = XYZ.from_file(options.coords)
+        new_mol = mxyz.all_molecules[-1]
         qcinp.jobs[0].params["rem"].pop("aimd_init_veloc", None)
         qcnv = QcNucVeloc(options.velocity)
         assert len(mxyz.molecules) == len(qcnv.velocities)
